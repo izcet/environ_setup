@@ -1,11 +1,12 @@
 #!/bin/sh
+###############################################################################
+## Variables ##################################################################
 
-NAME=$1
+NAME=$1 # name of the project, because apparently variables aren't copied
 GIT=$2
 
-LIB=libft
+LIB=libft # My default C library
 LDIR=~/backups/projects
-
 INC=inc
 SRC=src
 MAK=Makefile
@@ -14,6 +15,35 @@ MAK=Makefile
 VIM=.vim_commands
 # The commands in said file
 COM=":Stdheader\ndd\n:wq"
+
+R='\033[31m' # Red
+Y='\033[33m' # Yellow
+G='\033[32m' # Green
+C='\033[36m' # Cyan
+B='\033[34m' # Blue
+P='\033[35m' # Purple
+W='\033[37m' # White
+N='\033[0m'	 # No Color
+
+###############################################################################
+## Functions ##################################################################
+
+# Output a red error message
+# usage: error <text>
+error () {
+	echo "${R}Error: $1${N}"
+}
+
+# Create a directory. somewhat redundant
+# usage: make_dir <directory>
+make_dir () {
+	if [ -z $1 ] ; then
+		error "NULL parameter passed to ${P}make_dir()" # what is this, C?
+		return 1
+	fi
+	echo "${G}Creating directory ${P}$1"
+	mkdir -p $1
+}
 
 make_with_vim () {
 	if [ -z $1 ] ; then
@@ -76,6 +106,7 @@ add_lib () {
 	sed -i '' "s/\$(CC) \$(FLAGS)/\$(CC) \$(FLAGS) \$(${NLIB})/" $MAK
 }
 
+###############################################################################
 ## Code #######################################################################
 
 echo "*.[oa]" >> $GIT/info/exclude
@@ -91,6 +122,10 @@ echo "#ifndef $(echo $NAME | awk '{print toupper($0)}')_H" >> $INC/$NAME.h
 echo "# define $(echo $NAME | awk '{print toupper($0)}')_H" >> $INC/$NAME.h
 echo "\n\n\n#endif" >> $INC/$NAME.h
 
+make_with_vim $SRC/main.c
+echo "#include \"$NAME.h\"\n\nint\t\t\tmain(int argc, char **argv)" >> $SRC/main.c
+echo "{\n\t(void)argc;\n\t(void)argv;\n\treturn (0);\n}" >> $SRC/main.c
+
 make_with_vim $MAK
 echo "${B}Prepopulating text in ${P}$MAK"
 add_line "NAME\t\t=\t$NAME\n"
@@ -99,7 +134,7 @@ add_line "CFLAGS\t\t=\t-Wall -Werror -Wextra"
 add_line "XFLAGS\t\t=\t#-flags -for -X"
 add_line "FLAGS\t\t=\t\$(CFLAGS) \$(XFLAGS)\n"
 add_line "SRC_DIR\t\t=\t$SRC"
-add_line "SRC_FILE\t=\t##!!##"
+add_line "SRC_FILE\t=\tmain.c #TODO"
 add_line "SRCS\t\t=\t\$(addprefix \$(SRC_DIR)/, \$(SRC_FILE))\n"
 add_line "OBJ_DIR\t\t=\tobj"
 add_line "OBJ_FILE\t=\t\$(SRC_FILE:.c=.o)"
