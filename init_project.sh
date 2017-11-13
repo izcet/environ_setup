@@ -69,40 +69,31 @@ git init $NAME >> /dev/null
 cd $NAME
 echo "Entering repository."
 
-# Remote stuff TODO make this with user-chosen remote names/urls
-echo "${W}What is the ${C}vogsphere${W} repository url?"
-read URL
-while [ -z $URL ] ; do
-	error "Directory or URL cannot be NULL"
-	echo "${W}What is the ${C}vogsphere${W} repository url?"
-	read URL
-done
-echo "${B}Adding remote ${C}origin${B} at ${P}$URL${B}"
-git remote add origin $URL
-if [ "$?" -eq 1 ] ; then
-	error "Invalid repository. ${C}origin${R} will have to be manually set."
-	git remote rm origin
-	echo "${B}Remote ${C}origin${B} removed."
-else
-	git pull origin master 2> /dev/null
-fi
-
-echo "${W}(OPTIONAL) What is the ${C}github${W} repository url?"
-echo "Press enter to skip..."
-read URL
-if [ ! -z $URL ] ; then
-	echo "${B}Adding remote ${C}gh${B} at ${P}$URL${B}"
-	git remote add gh $URL
-	if [ "$?" -eq 1 ] ; then
-		error "Invalid repository. ${C}gh${R} will have to be manually set."
-		git remote rm gh
-		echo "${B}Remote ${C}gh${B} removed."
-	else
-		git pull gh master 2> /dev/null	
+# Remote stuff
+echo "${B}Optional: Add remote repository information.$N"
+REMOTE="origin"
+while [ ! -z $REMOTE ] ; do
+	echo "${W}What is the ${P}remote name$W?"
+	echo "$B(Enter a duplicate remote name to delete)$N"
+	echo "${B}(Press enter to skip...)$N"
+	read REMOTE
+	if [ ! -z $REMOTE ] ; then
+		echo "${W}What is the ${P}remote URL$W?"
+		read URL
+		if [ ! -z $URL ] ; then
+			git remote rm $REMOTE &> /dev/null
+			echo "${B}Adding remote ${C}$REMOTE${B} at ${P}$URL${B}"
+			git remote add $REMOTE $URL
+			git pull $REMOTE master 2> /dev/null
+			if [ "$?" -eq 1 ] ; then
+				error "Invalid repository. Deleting remote $C$REMOTE$R."
+				git remote rm $REMOTE
+			fi
+		else
+			echo "${R}No remote added for ${P}$REMOTE$R.$N"
+		fi
 	fi
-else
-	echo "\033[1A${B}Skipping..."
-fi
+done
 
 if [ ! -z $GIT_DIR ] ; then
 	GIT=$GIT_DIR
@@ -118,11 +109,15 @@ echo "${W}What kind of project is ${P}$NAME${W} going to be?"
 echo "${B}(For example: ${C}c$B, ${C}py$B, ${C}sh$B...)$N"
 read TYPE
 
-if [ -f $SCRIPTPATH/.init.$TYPE.sh ] ; then
-	echo "${B}Starting a new ${C}$TYPE$B project...$N"
-	sh $SCRIPTPATH/.init.$TYPE.sh "$NAME" "$GIT"
+if [ ! -z $TYPE ] ; then
+	if [ -f $SCRIPTPATH/.init.$TYPE.sh ] ; then
+		echo "${B}Starting a new ${C}$TYPE$B project...$N"
+		sh $SCRIPTPATH/.init.$TYPE.sh "$NAME" "$GIT"
+	else
+		echo "${R}No project type ${C}$TYPE$R found.$N"
+	fi
 else
-	echo "${R}No project type ${C}$TYPE$R found.$N"
+	echo "${B}Skipping...$N"
 fi
 
 echo "${B}Adding files to git and making first commit.${W}"
