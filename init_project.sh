@@ -90,7 +90,7 @@ insert_at () {
 # usage: add_lib 
 add_lib () {
 	if [ ! -d $LDIR/$LIB ] ; then
-		error "No $P$LIB$R directory found at ${P}$LDIR"
+		error "No directory found at ${P}$LDIR/$LIB$R"
 		return 1
 	fi
 	if [ -d ./$LIB ] ; then
@@ -115,7 +115,7 @@ add_lib () {
 	# This nonsense here. sed requires an escaped literal newline and tab
 	sed -i '' "s/^clean:/clean:\\
 	@cd \$(${NLIB}_DIR) \&\& make clean/" $MAK
-	sed -i '' "s/^fclean:/fclean:\\
+	sed -i '' "s/^fclean: clean/fclean: clean\\
 	@cd \$(${NLIB}_DIR) \&\& make fclean/" $MAK
 	sed -i '' "s/\$(CC) \$(FLAGS)/\$(CC) \$(FLAGS) \$(${NLIB})/" $MAK
 }
@@ -174,11 +174,12 @@ while [ -z $URL ] ; do
 done
 echo "${B}Adding remote ${C}origin${B} at ${P}$URL${B}"
 git remote add origin $URL
-git pull origin master 2> /dev/null
 if [ "$?" -eq 1 ] ; then
 	error "Invalid repository. ${C}origin${R} will have to be manually set."
 	git remote rm origin
 	echo "${B}Remote ${C}origin${B} removed."
+else
+	git pull origin master 2> /dev/null
 fi
 
 echo "${W}(OPTIONAL) What is the ${C}github${W} repository url?"
@@ -187,11 +188,12 @@ read URL
 if [ ! -z $URL ] ; then
 	echo "${B}Adding remote ${C}gh${B} at ${P}$URL${B}"
 	git remote add gh $URL
-	git pull gh master 2> /dev/null
 	if [ "$?" -eq 1 ] ; then
 		error "Invalid repository. ${C}gh${R} will have to be manually set."
 		git remote rm gh
 		echo "${B}Remote ${C}gh${B} removed."
+	else
+		git pull gh master 2> /dev/null	
 	fi
 else
 	echo "\033[1A${B}Skipping..."
@@ -205,6 +207,9 @@ if [ "$TYPE" -eq "2" ] ; then
 	echo "*.[oa]" >> $GIT/info/exclude
 fi
 echo "*.swp" >> $GIT/info/exclude
+
+echo "${G}Creating ${P}author${G} file."
+echo "$(whoami)" > author
 
 if [ "$TYPE" -eq "1" ] ; then
 	echo "${G}Creating file ${P}$NAME.sh"
@@ -245,7 +250,7 @@ if [ "$TYPE" -eq "2" ] ; then
 	add_line "\t@\$(CC) -c \$^ \$(CFLAGS) \$(INC_DIR) -o \$@\n"
 	add_line "clean:"
 	add_line "\t@rm -rf \$(OBJ_DIR)\n"
-	add_line "fclean:"
+	add_line "fclean: clean"
 	add_line "\t@rm -f \$(NAME)\n"
 	add_line "re: fclean all\n"
 	add_line "\$(OBJ_DIR):"
@@ -266,9 +271,9 @@ if [ "$TYPE" -eq "2" ] ; then
 	echo "\t${C}[2]$W no"
 	read TYPE
 	while [ "$TYPE" -eq "1" ] ; do
-		echo "${W}Enter library name: (folder name should match)"
+		echo "${W}Enter library directory name:"
 		read LIB
-		echo "Enter path to library:"
+		echo "Enter path to library: (full path to library)"
 		read LDIR
 		add_lib
 		echo "${W}Would you like to include another library?"
