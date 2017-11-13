@@ -1,12 +1,4 @@
 #!/bin/sh
-# usage ./.this_script.sh projectname git_directory
-
-
-# takes the name of the project from the parent
-NAME=$1
-
-# takes the git directory from the parent script
-GIT=$2
 
 LIB=libft
 LDIR=~/backups/projects
@@ -20,14 +12,6 @@ VIM=.vim_commands
 # The commands in said file
 COM=":Stdheader\ndd\n:wq"
 
-# Output a red error message
-# usage: error <text>
-error () {
-	echo "${R}Error: $1${N}"
-}
-
-# Create a file inside vim and run the commands
-# usage: make_with_vim <filename>
 make_with_vim () {
 	if [ -z $1 ] ; then
 		error "NULL parameter passed to ${P}make_with_vim()"
@@ -35,17 +19,6 @@ make_with_vim () {
 	fi
 	echo "${G}Creating file ${P}$1"
 	vim -s $VIM $1
-}
-
-# Create a directory. somewhat redundant
-# usage: make_dir <directory>
-make_dir () {
-	if [ -z $1 ] ; then
-		error "NULL parameter passed to ${P}make_dir()"
-		return 1
-	fi
-	echo "${G}Creating directory ${P}$1"
-	mkdir $1
 }
 
 # Append a line of text to the end of the Makefile

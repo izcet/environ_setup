@@ -33,7 +33,7 @@ error () {
 # usage: make_dir <directory>
 make_dir () {
 	if [ -z $1 ] ; then
-		error "NULL parameter passed to ${P}make_dir()"
+		error "NULL parameter passed to ${P}make_dir()" # what is this, C?
 		return 1
 	fi
 	echo "${G}Creating directory ${P}$1"
@@ -43,23 +43,20 @@ make_dir () {
 ###############################################################################
 ## Code #######################################################################
 
-
-# Basic error checking
 echo "\033[0m\c" #clear the font styling
 
 echo "${W}What is the name of the project?"
 read NAME
 
+# Basic error checking
 if [ -z "$NAME" ] ; then
 	error "The name of the project cannot be NULL."
 	exit
 fi
-
 if [ -d $NAME ] ; then
 	error "A directory called ${P}$NAME${R} already exists."
 	exit
 fi
-
 if [ -f $NAME ] ; then
 	error "A file named ${P}$NAME${R} already exists."
 	exit
@@ -72,7 +69,7 @@ git init $NAME >> /dev/null
 cd $NAME
 echo "Entering repository."
 
-# Remote stuff
+# Remote stuff TODO make this with user-chosen remote names/urls
 echo "${W}What is the ${C}vogsphere${W} repository url?"
 read URL
 while [ -z $URL ] ; do
