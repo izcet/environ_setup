@@ -120,7 +120,7 @@ read TYPE
 
 if [ -f $SCRIPTPATH/.init.$TYPE.sh ] ; then
 	echo "${B}Starting a new ${C}$TYPE$B project...$N"
-	sh $SCRIPTPATH/.init.$TYPE.sh
+	sh $SCRIPTPATH/.init.$TYPE.sh "$NAME" "$GIT"
 else
 	echo "${R}No project type ${C}$TYPE$R found.$N"
 fi

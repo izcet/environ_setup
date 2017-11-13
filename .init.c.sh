@@ -1,5 +1,8 @@
 #!/bin/sh
 
+NAME=$1
+GIT=$2
+
 LIB=libft
 LDIR=~/backups/projects
 
