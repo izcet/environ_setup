@@ -84,7 +84,7 @@ while [ ! -z $REMOTE ] ; do
 			git remote rm $REMOTE &> /dev/null
 			echo "${B}Adding remote ${C}$REMOTE${B} at ${P}$URL${B}"
 			git remote add $REMOTE $URL
-			git pull $REMOTE master 2> /dev/null
+			git pull $REMOTE master &> /dev/null 
 			if [ "$?" -eq 1 ] ; then
 				error "Invalid repository. Deleting remote $C$REMOTE$R."
 				git remote rm $REMOTE
