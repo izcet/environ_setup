@@ -83,9 +83,10 @@ add_lib () {
 		error "Library $P$LIB$R already exists in this directory."
 		return 1
 	fi
-	make_dir ./$LIB
-	echo "${B}Copying files from library ${P}$LDIR/$LIB"
-	ls -1A $LDIR/$LIB/ | grep -v .git | xargs -I % cp -rf $LDIR/$LIB/% ./$LIB/
+	ln -s "$LDIR/$LIB" "$LIB"
+	#make_dir ./$LIB
+	#echo "${B}Copying files from library ${P}$LDIR/$LIB"
+	#ls -1A $LDIR/$LIB/ | grep -v .git | xargs -I % cp -rf $LDIR/$LIB/% ./$LIB/
 	echo "${B}Adding necessary lines to ${P}$MAK"
 	NLIB=$(echo $LIB | awk '{print toupper($0)}')
 	add_line "\n\$($NLIB):"
