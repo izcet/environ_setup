@@ -102,9 +102,6 @@ fi
 echo "*.swp" >> $GIT/info/exclude
 echo ".*.swp" >> $GIT/info/exclude
 
-echo "${G}Creating ${P}author${G} file."
-echo "$(whoami)" > author
-
 # Project typing
 echo "${W}What kind of project is ${P}$NAME${W} going to be?"
 echo "${B}(For example: ${C}c$B, ${C}py$B, ${C}sh$B...)$N"
